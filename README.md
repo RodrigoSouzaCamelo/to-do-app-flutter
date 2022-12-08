@@ -1,6 +1,6 @@
 # ToDo App
 
-A new Flutter project.
+ToDo APP is a simple app that creates a to-do list.
 
 ## Getting Started
 
