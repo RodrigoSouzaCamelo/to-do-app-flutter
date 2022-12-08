@@ -3,10 +3,23 @@ import 'package:to_do_app/constants/colors.dart';
 import 'package:to_do_app/models/todo.dart';
 import 'package:to_do_app/widgets/todo_item.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   Home({Key? key}) : super(key: key);
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  List<ToDo> _foundToDo = [];
   final toDoList = ToDo.toDoList();
+  final _todoController = TextEditingController();
+
+  @override
+  void initState() {
+    _foundToDo = toDoList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +46,11 @@ class Home extends StatelessWidget {
                           ),
                         ),
                       ),
-                      for (ToDo todo in toDoList)
+                      for (ToDo todo in _foundToDo)
                         ToDoItem(
                           toDo: todo,
+                          onToDoChange: _handleToDoChange,
+                          onDeleteItem: _deleteToDoItem,
                         )
                     ],
                   ),
@@ -70,22 +85,25 @@ class Home extends StatelessWidget {
                       ],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                          hintText: 'Adicionar novo item',
-                          border: InputBorder.none),
+                    child: TextField(
+                      controller: _todoController,
+                      decoration: const InputDecoration(
+                        hintText: 'Adicionar novo item',
+                        border: InputBorder.none,
+                      ),
                     ),
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(bottom: 20, right: 20),
+                  margin: const EdgeInsets.only(bottom: 20, right: 20),
                   child: ElevatedButton(
-                    onPressed: (){},
+                    onPressed: () {
+                      _addToDoItem(_todoController.text);
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: tdBlue,
-                      minimumSize: const Size(60, 60),
-                      elevation: 10
-                    ),
+                        backgroundColor: tdBlue,
+                        minimumSize: const Size(60, 60),
+                        elevation: 10),
                     child: const Text(
                       '+',
                       style: TextStyle(
@@ -102,6 +120,47 @@ class Home extends StatelessWidget {
     );
   }
 
+  void _handleToDoChange(ToDo toDo) {
+    setState(() {
+      toDo.isDone = !toDo.isDone;
+    });
+  }
+
+  void _deleteToDoItem(String id) {
+    setState(() {
+      toDoList.removeWhere((element) => element.id == id);
+    });
+  }
+
+  void _addToDoItem(String toDo) {
+    setState(() {
+      toDoList.add(ToDo(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: toDo,
+      ));
+    });
+    _runFilter('');
+    _todoController.clear();
+  }
+
+  void _runFilter(String filter) {
+    List<ToDo> results = [];
+
+    if (filter.isEmpty) {
+      results = toDoList;
+    } else {
+      results = toDoList
+          .where((toDo) => toDo.title!
+            .toLowerCase()
+            .contains(filter.toLowerCase()))
+          .toList();
+    }
+
+    setState(() {
+      _foundToDo = results;
+    });
+  }
+
   Container searchBox() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -109,8 +168,9 @@ class Home extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const TextField(
-        decoration: InputDecoration(
+      child: TextField(
+        onChanged: _runFilter,
+        decoration: const InputDecoration(
             contentPadding: EdgeInsets.all(0),
             prefixIcon: Icon(
               Icons.search,
@@ -140,7 +200,7 @@ class Home extends StatelessWidget {
             color: tdBlack,
             size: 30,
           ),
-           SizedBox(
+          SizedBox(
             width: 40,
             height: 40,
             child: ClipRRect(
