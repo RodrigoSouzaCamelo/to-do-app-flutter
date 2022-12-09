@@ -1,8 +1,19 @@
 # ToDo App
+![Badge em Desenvolvimento](http://img.shields.io/static/v1?label=STATUS&message=DEVELOPMENT&color=GREEN&style=for-the-badge)
 
-A new Flutter project.
+ToDo APP is a simple app that creates a to-do list.
 
-## Getting Started
+# Status' Project
+
+:construction: Project under construction :construction:
+
+# Project Features :hammer:
+
+- `Feature 1`: Creating an item to do
+- `Feature 2`: Deleting an item to do
+- `Feature 3`: Search for an item to do
+
+# Getting Started
 
 This project is a starting point for a Flutter application.
 
